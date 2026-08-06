@@ -1,0 +1,10 @@
+{
+  "name": "tradingview-local-customizer",
+  "version": "0.5.7",
+  "private": true,
+  "description": "Visual-only local customizations for TradingView in Chromium browsers.",
+  "scripts": {
+    "check": "node --check src/core/namespace.js && node --check src/core/settings.js && node --check src/core/style-manager.js && node --check src/core/screener-table-adapter.js && node --check src/features/interface-theme.js && node --check src/features/screener-symbol-width.js && node --check src/features/screener-table-density.js && node --check src/features/screener-grid-lines.js && node --check src/core/lifecycle.js && node --check src/content.js && node --check popup.js",
+    "test": "node --test tests/*.test.js"
+  }
+}

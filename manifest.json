@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "TradingView Local Customizer",
+  "version": "0.5.7",
+  "description": "Local, visual-only TradingView layout customizations.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["https://*.tradingview.com/*"],
+  "action": {
+    "default_title": "TradingView Local Customizer",
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "popup.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.tradingview.com/*"],
+      "js": [
+        "src/core/namespace.js",
+        "src/core/settings.js",
+        "src/core/style-manager.js",
+        "src/core/screener-table-adapter.js",
+        "src/features/interface-theme.js",
+        "src/features/screener-symbol-width.js",
+        "src/features/screener-table-density.js",
+        "src/features/screener-grid-lines.js",
+        "src/core/lifecycle.js",
+        "src/content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}

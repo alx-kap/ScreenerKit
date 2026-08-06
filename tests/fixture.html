@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Screener feature fixture</title>
+    <style>
+      body { margin: 24px; font: 14px system-ui; background: var(--color-background-page-platform, #111); color: var(--color-text-primary, #eee); }
+      fieldset { width: 700px; margin-bottom: 18px; border: 1px solid var(--color-border, #444); background: var(--color-pane-bg, #181818); }
+      .fixture-separator { width: 700px; height: 2px; margin: 12px 0; background: var(--color-chart-page-bg, #444); }
+      .symbol-search-fixture { width: 700px; margin: 12px 0; border: 1px solid var(--color-border, #444); }
+      .symbol-search-row { padding: 12px; background: var(--color-container-fill-tertiary-inverse, #fff); border-bottom: 1px solid var(--color-container-fill-primary-neutral-light, #ddd); }
+      .symbol-search-row:last-child { border-bottom: 0; }
+      .layout-menu-fixture { width: 380px; margin: 12px 0; padding: 8px; background: var(--color-popup-background, #fff); }
+      .layout-menu-item { margin-bottom: 4px; padding: 12px; border-radius: 6px; background: var(--ui-lib-in-listItem-backgroundColor, var(--color-container-fill-tertiary-inverse, #fff)); }
+      .layout-menu-item:hover { background: var(--ui-lib-in-listItem-backgroundColorHover, var(--color-container-fill-primary-neutral-extra-light, #eee)); }
+      .layout-menu-item.selected { background: var(--ui-lib-in-listItem-backgroundColorSelected, var(--color-container-fill-primary-neutral-extra-bold, #222)); color: var(--ui-lib-in-listItem-textColorSelected, #fff); }
+      .layout-menu-divider { height: 1px; margin: 8px 0; background: var(--ui-lib-in-listItem-dividerColor, var(--color-border-primary-neutral-light, #ddd)); }
+      .fixture-theme-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+      .fixture-theme-controls label { display: flex; gap: 5px; align-items: center; }
+      .panel { box-sizing: border-box; width: 420px; overflow: auto; border: 1px solid var(--color-border, #444); padding-left: 20px; background: var(--color-pane-bg, #181818); }
+      table { width: 700px; table-layout: auto; border-spacing: 0; background: var(--color-body-bg, #181818); }
+      th, td { height: 40px; padding: 0 12px; border-bottom: 1px solid var(--color-border-table, #333); text-align: left; white-space: nowrap; }
+      th:first-child { position: sticky; left: 0; width: 147px; background: var(--color-screener-header-bg, #202020); }
+      td:first-child { position: sticky; left: 0; width: 147px; padding-left: 20px; background: var(--color-body-bg, #181818); }
+      .ticker-cell { display: flex; align-items: center; width: 115px; }
+      .ticker-cell a { display: block; min-width: 56px; max-width: 120px; padding: 4px 8px; background: #333; border-radius: 4px; }
+      .fixture-flag-slot { display: block; width: 0; }
+      .fixture-flag { display: flex; position: relative; align-items: center; width: 15px; height: 24px; margin: 0 5px 0 -20px; color: #ff5252; visibility: hidden; }
+      .fixture-flag.active { visibility: visible; }
+      .fixture-flag svg { width: 12px; height: 13px; fill: currentColor; }
+      .fixture-symbol-header { display: flex; align-items: center; gap: 12px; width: 111px; height: 34px; }
+      .fixture-symbol-header > button { display: flex; align-items: center; justify-content: center; width: 34px; min-width: 34px; height: 34px; padding: 0; border: 0; background: transparent; color: inherit; }
+      .fixture-symbol-header > button span, .fixture-symbol-header > button svg { display: block; width: 28px; height: 28px; }
+      .fixture-symbol-header > button path { stroke: currentColor; }
+      .fixture-symbol-labels { display: grid; grid-template-columns: 45px 20px; width: 65px; height: 34px; align-items: center; }
+      .fixture-symbol-labels > div { overflow: hidden; }
+      .fixture-symbol-labels > button { width: 18px; height: 18px; padding: 0; }
+      .fixture-symbol-labels > span::after { content: attr(data-matches); }
+      tbody > tr { position: relative; }
+      tbody > tr::after { content: ""; display: none; position: absolute; inset: 0 0 1px; height: 40px; border: 2px solid #ddd; border-radius: 10px; pointer-events: none; }
+      tbody > tr.selectedClass::after { display: block; }
+    </style>
+  </head>
+  <body>
+    <h1>TradingView-like Screener fixture</h1>
+    <p id="result">Starting…</p>
+    <fieldset>
+      <legend>Interface theme fixture</legend>
+      <div class="fixture-theme-controls">
+        <label>Theme
+          <select id="fixture-theme">
+            <option value="native">Default</option>
+            <option value="oled">OLED Black</option>
+            <option value="custom">Custom</option>
+          </select>
+        </label>
+        <label>Page <input data-fixture-theme-token="page" type="color"></label>
+        <label>Surface <input data-fixture-theme-token="surface" type="color"></label>
+        <label>Elevated <input data-fixture-theme-token="elevated" type="color"></label>
+        <label>Border <input data-fixture-theme-token="border" type="color"></label>
+        <label>Text <input data-fixture-theme-token="text" type="color"></label>
+        <label>Muted <input data-fixture-theme-token="muted" type="color"></label>
+        <label>Accent <input data-fixture-theme-token="accent" type="color"></label>
+      </div>
+    </fieldset>
+    <div class="fixture-separator" aria-hidden="true"></div>
+    <div class="symbol-search-fixture" aria-label="Symbol Search rows">
+      <div class="symbol-search-row">MTRN — Materion Corporation — NYSE</div>
+      <div class="symbol-search-row">MTRN — Maytronics Ltd. — TASE</div>
+    </div>
+    <div class="layout-menu-fixture" data-qa-id="popup-menu-container" role="grid" aria-label="Layouts menu">
+      <div class="layout-menu-item" data-qa-id="save-load-menu-item-save" role="row">Save layout</div>
+      <div class="layout-menu-divider"></div>
+      <div class="layout-menu-item selected" role="row">D - H (SMAs) - DolVol<br>KLIC, 1D</div>
+      <div class="layout-menu-item" role="row">iPhone<br>ACHC, 1D</div>
+    </div>
+    <div data-qa-id="screener-widget">
+    <div class="panel" data-query-type="container">
+      <table>
+        <thead>
+          <tr>
+            <th data-field="TickerUniversal">
+              <div title="Symbol"><div><div class="fixture-symbol-header">
+                <button title="Search"><span><span><svg viewBox="0 0 28 28"><path d="M5 5 L20 20"></path></svg></span></span></button>
+                <div class="fixture-symbol-labels">
+                  <div><div id="fixture-symbol-label">Symbol</div></div>
+                  <button data-qa-id="sort-button-direction" aria-label="Sort descending">↓</button>
+                  <span data-matches="57"></span>
+                </div>
+              </div></div></div>
+            </th>
+            <th>Price</th><th>Change %</th>
+          </tr>
+        </thead>
+        <tbody data-testid="selectable-rows-table-body">
+          <tr class="selectedClass" data-rowkey="NASDAQ:AAPL"><td><span class="ticker-cell"><span class="fixture-flag-slot"><div class="fixture-flag active"><svg viewBox="0 0 14 12"><path d="M14 12l-4-6 4-6H0v12z"></path></svg></div></span><a>AAPL</a></span></td><td>325.10</td><td>−0.81%</td></tr>
+          <tr data-rowkey="NASDAQ:MSFT"><td><span class="ticker-cell"><span class="fixture-flag-slot"><div class="fixture-flag"><svg viewBox="0 0 14 12"><path d="M14 12l-4-6 4-6H0v12z"></path></svg></div></span><a>MSFT</a></span></td><td>588.68</td><td>−2.28%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    </div>
+    <script src="../src/core/namespace.js"></script>
+    <script src="../src/core/settings.js"></script>
+    <script src="../src/core/style-manager.js"></script>
+    <script src="../src/core/screener-table-adapter.js"></script>
+    <script src="../src/features/interface-theme.js"></script>
+    <script src="../src/features/screener-symbol-width.js?v=0.5.7"></script>
+    <script src="../src/features/screener-table-density.js"></script>
+    <script src="../src/features/screener-grid-lines.js"></script>
+    <script>
+      const root = globalThis.TVCustomizer;
+      const fixtureParams = new URLSearchParams(location.search);
+      if (fixtureParams.get("broken") === "true") {
+        document.querySelector("tbody")?.removeAttribute("data-testid");
+      }
+      const adapter = new root.ScreenerTableAdapter(document);
+      const styleManager = new root.StyleManager(document);
+      const themeFeature = new root.InterfaceThemeFeature({ document, styleManager });
+      const symbolFeature = new root.ScreenerSymbolWidthFeature({
+        document,
+        styleManager,
+        adapter
+      });
+      const densityFeature = new root.ScreenerTableDensityFeature({ document, styleManager, adapter });
+      const gridLinesFeature = new root.ScreenerGridLinesFeature({ document, styleManager, adapter });
+      const params = fixtureParams;
+      document.getElementById("fixture-symbol-label").textContent = params.get("headerLabel") || "Symbol";
+      const themeSelect = document.getElementById("fixture-theme");
+      const themeInputs = Object.fromEntries(root.Settings.THEME_TOKEN_KEYS.map(key => [
+        key,
+        document.querySelector(`[data-fixture-theme-token="${key}"]`)
+      ]));
+      const customTheme = root.Settings.themeTokens(Object.fromEntries(root.Settings.THEME_TOKEN_KEYS.map(key => [
+        key,
+        params.get(`theme-${key}`) || root.Settings.CUSTOM_THEME_DEFAULT[key]
+      ])));
+      themeSelect.value = params.get("theme") || "native";
+      for (const [key, input] of Object.entries(themeInputs)) input.value = customTheme[key];
+      const preset = params.get("preset") || "compact";
+      const densityInput = { enabled: params.get("density") !== "off", preset };
+      for (const key of Object.keys(root.Settings.DENSITY_RANGES)) {
+        if (params.has(key)) densityInput[key] = params.get(key);
+      }
+      const density = preset === "custom"
+        ? root.Settings.normalizeDensity(densityInput)
+        : root.Settings.applyDensityPreset(densityInput, preset);
+      symbolFeature.update({ enabled: params.get("symbol") !== "off", widthPx: params.get("symbolWidth") || 100 });
+      densityFeature.update(density);
+      const gridLines = root.Settings.normalizeGridLines({
+        enabled: params.get("gridLines") !== "off",
+        color: params.get("gridColor") || root.Settings.GRID_LINE_COLOR_DEFAULT
+      });
+      gridLinesFeature.update(gridLines);
+      function renderFixtureTheme() {
+        const custom = Object.fromEntries(Object.entries(themeInputs).map(([key, input]) => [key, input.value]));
+        themeFeature.update({ selection: themeSelect.value, custom });
+        document.getElementById("result").textContent = JSON.stringify({
+          theme: themeFeature.diagnose(),
+          symbol: symbolFeature.diagnose(),
+          density: densityFeature.diagnose(),
+          gridLines: gridLinesFeature.diagnose()
+        });
+      }
+      themeSelect.addEventListener("change", renderFixtureTheme);
+      for (const input of Object.values(themeInputs)) input.addEventListener("input", renderFixtureTheme);
+      renderFixtureTheme();
+      globalThis.fixtureFeatures = { themeFeature, symbolFeature, densityFeature, gridLinesFeature, density, gridLines };
+    </script>
+  </body>
+</html>

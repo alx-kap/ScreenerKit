@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TradingView Local Customizer</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>TradingView Customizer</h1>
+          <p>Local visual changes only</p>
+        </div>
+        <label class="switch" title="Enable all customizations">
+          <input id="master-enabled" type="checkbox">
+          <span>Enabled</span>
+        </label>
+      </header>
+
+      <section aria-labelledby="theme-heading">
+        <div class="section-title">
+          <div>
+            <h2 id="theme-heading">Interface theme</h2>
+            <p>Recolors TradingView controls and panels, not chart canvases.</p>
+          </div>
+          <output id="theme-selection-name">Default</output>
+        </div>
+
+        <div class="theme-grid" role="group" aria-label="Interface theme">
+          <button type="button" data-theme-selection="native">
+            <span class="theme-native-swatch" aria-hidden="true"></span>
+            <span>Default</span>
+          </button>
+          <button type="button" data-theme-selection="oled">
+            <span class="theme-swatch" style="--swatch-page:#000000;--swatch-surface:#000000;--swatch-accent:#3b82f6" aria-hidden="true"></span>
+            <span>OLED Black</span>
+          </button>
+          <button type="button" data-theme-selection="custom">
+            <span id="custom-theme-swatch" class="theme-swatch" aria-hidden="true"></span>
+            <span>Custom</span>
+          </button>
+        </div>
+
+        <div id="custom-theme-editor" class="custom-theme-editor" hidden>
+          <div class="custom-theme-grid">
+            <label class="theme-color-label" for="theme-page"><span>Page</span><input id="theme-page" data-theme-token="page" type="color"></label>
+            <label class="theme-color-label" for="theme-surface"><span>Surface</span><input id="theme-surface" data-theme-token="surface" type="color"></label>
+            <label class="theme-color-label" for="theme-elevated"><span>Elevated</span><input id="theme-elevated" data-theme-token="elevated" type="color"></label>
+            <label class="theme-color-label" for="theme-border"><span>Border</span><input id="theme-border" data-theme-token="border" type="color"></label>
+            <label class="theme-color-label" for="theme-text"><span>Text</span><input id="theme-text" data-theme-token="text" type="color"></label>
+            <label class="theme-color-label" for="theme-muted"><span>Muted text</span><input id="theme-muted" data-theme-token="muted" type="color"></label>
+            <label class="theme-color-label" for="theme-accent"><span>Accent</span><input id="theme-accent" data-theme-token="accent" type="color"></label>
+          </div>
+          <p id="theme-contrast" class="contrast-message" role="status"></p>
+          <div class="actions single-action">
+            <button id="reset-custom-theme" type="button">Reset custom</button>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="symbol-heading">
+        <div class="section-title">
+          <div>
+            <h2 id="symbol-heading">Compact Symbol column</h2>
+            <p>Reduces the first column in Stock Screener tables.</p>
+          </div>
+          <input id="feature-enabled" type="checkbox" aria-label="Enable compact Symbol column">
+        </div>
+
+        <label for="symbol-width">Width <output id="width-output" for="symbol-width">100 px</output></label>
+        <input id="symbol-width" type="range" min="76" max="220" step="1">
+
+        <div class="actions">
+          <button id="reset-width" type="button">Reset width</button>
+          <button id="refresh" type="button">Refresh detection</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="density-heading">
+        <div class="section-title">
+          <div>
+            <h2 id="density-heading">Screener table density</h2>
+            <p>Adjusts table spacing, row sizes, and typography.</p>
+          </div>
+          <input id="density-enabled" type="checkbox" aria-label="Enable Screener table density">
+        </div>
+
+        <div class="preset-heading">
+          <span>Preset</span>
+          <output id="density-preset-name">Compact</output>
+        </div>
+        <div class="preset-group" role="group" aria-label="Density preset">
+          <button type="button" data-density-preset="comfortable">Comfortable</button>
+          <button type="button" data-density-preset="compact">Compact</button>
+          <button type="button" data-density-preset="dense">Dense</button>
+        </div>
+
+        <details id="density-advanced">
+          <summary>Advanced</summary>
+
+          <label class="range-label" for="body-font">Body font <output id="body-font-output" for="body-font">13 px</output></label>
+          <input id="body-font" data-density-key="bodyFontPx" type="range" min="10" max="16" step="1">
+
+          <label class="range-label" for="header-font">Header font <output id="header-font-output" for="header-font">13 px</output></label>
+          <input id="header-font" data-density-key="headerFontPx" type="range" min="10" max="16" step="1">
+
+          <label class="range-label" for="row-height">Row height <output id="row-height-output" for="row-height">34 px</output></label>
+          <input id="row-height" data-density-key="rowHeightPx" type="range" min="28" max="52" step="1">
+
+          <label class="range-label" for="header-height">Header height <output id="header-height-output" for="header-height">42 px</output></label>
+          <input id="header-height" data-density-key="headerHeightPx" type="range" min="34" max="56" step="1">
+
+          <label class="range-label" for="cell-padding">Horizontal padding <output id="cell-padding-output" for="cell-padding">8 px</output></label>
+          <input id="cell-padding" data-density-key="cellPaddingXPx" type="range" min="0" max="20" step="1">
+
+          <label class="range-label" for="left-inset">Sidebar left inset <output id="left-inset-output" for="left-inset">8 px</output></label>
+          <input id="left-inset" data-density-key="leftInsetPx" type="range" min="0" max="24" step="1">
+        </details>
+
+        <div class="actions single-action">
+          <button id="reset-density" type="button">Reset density</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="grid-lines-heading">
+        <div class="section-title">
+          <div>
+            <h2 id="grid-lines-heading">Screener grid lines</h2>
+            <p>Adds column separators and recolors row separators.</p>
+          </div>
+          <input id="grid-lines-enabled" type="checkbox" aria-label="Enable Screener grid lines">
+        </div>
+
+        <label class="color-label" for="grid-lines-color">
+          <span>Line color</span>
+          <span class="color-value">
+            <input id="grid-lines-color" type="color" value="#2a2e39">
+            <output id="grid-lines-color-output" for="grid-lines-color">#2a2e39</output>
+          </span>
+        </label>
+
+        <div class="actions single-action">
+          <button id="reset-grid-lines-color" type="button">Reset color</button>
+        </div>
+      </section>
+
+      <section aria-labelledby="diagnostics-heading">
+        <div class="section-title">
+          <div>
+            <h2 id="diagnostics-heading">Diagnostics</h2>
+            <p>Reports detection state without collecting page data.</p>
+          </div>
+          <input id="diagnostics-enabled" type="checkbox" aria-label="Enable diagnostics">
+        </div>
+        <div id="status" class="status-list" role="status">Checking this tab…</div>
+      </section>
+    </main>
+    <script src="src/core/namespace.js"></script>
+    <script src="src/core/settings.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
