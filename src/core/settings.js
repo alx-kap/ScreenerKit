@@ -7,6 +7,7 @@
   const WIDTH_MAX = 220;
   const WIDTH_DEFAULT = 100;
   const GRID_LINE_COLOR_DEFAULT = "#2a2e39";
+  const MULTI_SORT_FIELD_RE = /^[\w|]+$/;
   const THEME_TOKEN_KEYS = Object.freeze([
     "page",
     "surface",
@@ -94,6 +95,11 @@
         enabled: false,
         color: GRID_LINE_COLOR_DEFAULT
       }),
+      screenerMultiSort: Object.freeze({
+        enabled: false,
+        pinnedField: null,
+        pinnedOrder: "asc"
+      }),
       interfaceTheme: Object.freeze({
         selection: "native",
         custom: CUSTOM_THEME_DEFAULT
@@ -163,6 +169,15 @@
     };
   }
 
+  function normalizeMultiSort(input = {}) {
+    const rawField = typeof input.pinnedField === "string" ? input.pinnedField.trim() : "";
+    return {
+      enabled: input.enabled === true,
+      pinnedField: MULTI_SORT_FIELD_RE.test(rawField) ? rawField : null,
+      pinnedOrder: input.pinnedOrder === "desc" ? "desc" : "asc"
+    };
+  }
+
   function normalizeHexColor(value, fallback) {
     const color = typeof value === "string" ? value.trim().toLowerCase() : "";
     return /^#[0-9a-f]{6}$/.test(color) ? color : fallback;
@@ -212,6 +227,7 @@
     const densityInput = input.features?.screenerTableDensity || {};
     const gridLinesInput = input.features?.screenerGridLines || {};
     const interfaceThemeInput = input.features?.interfaceTheme || {};
+    const multiSortInput = input.features?.screenerMultiSort || {};
     return {
       version: 4,
       enabled: input.enabled !== false,
@@ -223,6 +239,7 @@
         },
         screenerTableDensity: normalizeDensity(densityInput),
         screenerGridLines: normalizeGridLines(gridLinesInput),
+        screenerMultiSort: normalizeMultiSort(multiSortInput),
         interfaceTheme: normalizeInterfaceTheme(interfaceThemeInput)
       }
     };
@@ -246,6 +263,7 @@
     WIDTH_MAX,
     WIDTH_DEFAULT,
     GRID_LINE_COLOR_DEFAULT,
+    MULTI_SORT_FIELD_RE,
     THEME_TOKEN_KEYS,
     THEME_PRESETS,
     CUSTOM_THEME_DEFAULT,
@@ -256,6 +274,7 @@
     applyDensityPreset,
     normalizeGridLineColor,
     normalizeGridLines,
+    normalizeMultiSort,
     normalizeHexColor,
     themeTokens,
     normalizeInterfaceTheme,

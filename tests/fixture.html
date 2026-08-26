@@ -89,7 +89,8 @@
                 </div>
               </div></div></div>
             </th>
-            <th>Price</th><th>Change %</th>
+            <th data-field="Price"><div><div><div>Price</div></div></div></th>
+            <th data-field="Change|TimeResolution1D"><div><div><div>Change %</div></div></div></th>
           </tr>
         </thead>
         <tbody data-testid="selectable-rows-table-body">
@@ -99,6 +100,14 @@
       </table>
     </div>
     </div>
+    <div data-qa-id="column-menu" hidden>
+      <div data-qa-id="column-menu-item"><div data-qa-id="column-menu-item" tabindex="0">Sort ascending</div></div>
+      <div data-qa-id="column-menu-item"><div data-qa-id="column-menu-item" tabindex="0">Sort descending</div></div>
+      <div data-qa-id="column-menu-item"><div data-qa-id="column-menu-item" tabindex="0">Move left</div></div>
+      <div data-qa-id="column-menu-item"><div data-qa-id="column-menu-item" tabindex="0">Move right</div></div>
+      <div data-qa-id="column-menu-item"><div data-qa-id="column-menu-item" tabindex="0">Move to the start</div></div>
+      <div data-qa-id="column-menu-item"><div data-qa-id="column-menu-item" tabindex="0">Move to the end</div></div>
+    </div>
     <script src="../src/core/namespace.js"></script>
     <script src="../src/core/settings.js"></script>
     <script src="../src/core/style-manager.js"></script>
@@ -107,6 +116,7 @@
     <script src="../src/features/screener-symbol-width.js?v=0.5.7"></script>
     <script src="../src/features/screener-table-density.js"></script>
     <script src="../src/features/screener-grid-lines.js"></script>
+    <script src="../src/features/screener-multi-sort.js"></script>
     <script>
       const root = globalThis.TVCustomizer;
       const fixtureParams = new URLSearchParams(location.search);
@@ -123,6 +133,7 @@
       });
       const densityFeature = new root.ScreenerTableDensityFeature({ document, styleManager, adapter });
       const gridLinesFeature = new root.ScreenerGridLinesFeature({ document, styleManager, adapter });
+      const multiSortFeature = new root.ScreenerMultiSortFeature({ document, styleManager, adapter, persistPin: async () => {} });
       const params = fixtureParams;
       document.getElementById("fixture-symbol-label").textContent = params.get("headerLabel") || "Symbol";
       const themeSelect = document.getElementById("fixture-theme");
@@ -151,6 +162,15 @@
         color: params.get("gridColor") || root.Settings.GRID_LINE_COLOR_DEFAULT
       });
       gridLinesFeature.update(gridLines);
+      const multiSort = root.Settings.normalizeMultiSort({
+        enabled: params.get("multiSort") !== "off",
+        pinnedField: params.get("pinField"),
+        pinnedOrder: params.get("pinOrder")
+      });
+      multiSortFeature.update(multiSort);
+      const priceTh = document.querySelector('th[data-field="Price"]');
+      priceTh?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      multiSortFeature.injectMenuIfNeeded();
       function renderFixtureTheme() {
         const custom = Object.fromEntries(Object.entries(themeInputs).map(([key, input]) => [key, input.value]));
         themeFeature.update({ selection: themeSelect.value, custom });
@@ -158,13 +178,16 @@
           theme: themeFeature.diagnose(),
           symbol: symbolFeature.diagnose(),
           density: densityFeature.diagnose(),
-          gridLines: gridLinesFeature.diagnose()
+          gridLines: gridLinesFeature.diagnose(),
+          multiSort: multiSortFeature.diagnose(),
+          menuItemInjected: Boolean(document.querySelector('[data-tvt-pin-menu-item="true"]')),
+          firstRow: document.querySelector("tbody tr[data-rowkey]")?.getAttribute("data-rowkey")
         });
       }
       themeSelect.addEventListener("change", renderFixtureTheme);
       for (const input of Object.values(themeInputs)) input.addEventListener("input", renderFixtureTheme);
       renderFixtureTheme();
-      globalThis.fixtureFeatures = { themeFeature, symbolFeature, densityFeature, gridLinesFeature, density, gridLines };
+      globalThis.fixtureFeatures = { themeFeature, symbolFeature, densityFeature, gridLinesFeature, multiSortFeature, density, gridLines, multiSort };
     </script>
   </body>
 </html>

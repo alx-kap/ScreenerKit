@@ -7,6 +7,9 @@ const themeSource = fs.readFileSync("src/features/interface-theme.js", "utf8");
 const symbolSource = fs.readFileSync("src/features/screener-symbol-width.js", "utf8");
 const densitySource = fs.readFileSync("src/features/screener-table-density.js", "utf8");
 const gridLinesSource = fs.readFileSync("src/features/screener-grid-lines.js", "utf8");
+const multiSortSource = fs.readFileSync("src/features/screener-multi-sort.js", "utf8");
+const hookSource = fs.readFileSync("src/features/screener-multi-sort-hook.js", "utf8");
+const backgroundSource = fs.readFileSync("src/background.js", "utf8");
 const lifecycleSource = fs.readFileSync("src/core/lifecycle.js", "utf8");
 const popupSource = fs.readFileSync("popup.js", "utf8");
 const contentSource = fs.readFileSync("src/content.js", "utf8");
@@ -31,7 +34,8 @@ test("does not encode TradingView hashed class names", () => {
     "LasUBsXx"
   ];
   for (const token of observedGeneratedTokens) {
-    assert.equal((adapterSource + themeSource + symbolSource + densitySource + gridLinesSource).includes(token), false, `unexpected generated class token: ${token}`);
+    const sources = adapterSource + themeSource + symbolSource + densitySource + gridLinesSource + multiSortSource + hookSource + backgroundSource;
+    assert.equal(sources.includes(token), false, `unexpected generated class token: ${token}`);
   }
 });
 
@@ -51,6 +55,7 @@ test("popup bootstraps a missing content script and content startup is idempoten
   assert.match(popupSource, /src\/core\/screener-table-adapter\.js/);
   assert.match(popupSource, /src\/features\/screener-table-density\.js/);
   assert.match(popupSource, /src\/features\/screener-grid-lines\.js/);
+  assert.match(popupSource, /src\/features\/screener-multi-sort\.js/);
   assert.match(popupSource, /src\/features\/interface-theme\.js/);
   assert.match(contentSource, /if \(root\.runtimeStarted\) return/);
 });
@@ -58,6 +63,7 @@ test("popup bootstraps a missing content script and content startup is idempoten
 test("lifecycle routes settings by each feature settings key", () => {
   assert.match(lifecycleSource, /this\.settings\.features\?\.\[feature\.settingsKey\]/);
   assert.doesNotMatch(lifecycleSource, /features\?\.screenerSymbolWidth/);
+  assert.match(contentSource, /features: \[interfaceThemeFeature, symbolWidthFeature, tableDensityFeature, gridLinesFeature, multiSortFeature\]/);
 });
 
 test("density and Symbol teardown own separate markers and variables", () => {
@@ -88,7 +94,7 @@ test("grid-line diagnostics and runtime registration are exposed", () => {
   assert.match(gridLinesSource, /status,/);
   assert.match(gridLinesSource, /targetCount,/);
   assert.match(contentSource, /new root\.ScreenerGridLinesFeature/);
-  assert.match(contentSource, /features: \[interfaceThemeFeature, symbolWidthFeature, tableDensityFeature, gridLinesFeature\]/);
+  assert.match(contentSource, /features: \[interfaceThemeFeature, symbolWidthFeature, tableDensityFeature, gridLinesFeature, multiSortFeature\]/);
   assert.match(popupSource, /"screener-grid-lines": "Grid lines"/);
 });
 
@@ -106,7 +112,7 @@ test("interface theme owns a root marker, semantic variables, and teardown", () 
 
 test("interface theme is registered before the table features", () => {
   assert.match(contentSource, /new root\.InterfaceThemeFeature/);
-  assert.match(contentSource, /features: \[interfaceThemeFeature, symbolWidthFeature, tableDensityFeature, gridLinesFeature\]/);
+  assert.match(contentSource, /features: \[interfaceThemeFeature, symbolWidthFeature, tableDensityFeature, gridLinesFeature, multiSortFeature\]/);
   assert.match(popupSource, /"interface-theme": "Interface theme"/);
 });
 
@@ -125,9 +131,71 @@ test("popup exposes every theme preset and custom token control", () => {
 });
 
 test("manifest loads interface themes at document start", () => {
-  assert.equal(manifest.version, "0.5.7");
+  assert.equal(manifest.version, "0.6.0");
   assert.equal(manifest.content_scripts[0].run_at, "document_start");
   assert.ok(manifest.content_scripts[0].js.includes("src/features/interface-theme.js"));
+});
+
+test("multi-sort uses the column-menu contract and owns its markers", () => {
+  assert.match(multiSortSource, /data-qa-id="column-menu"/);
+  assert.match(multiSortSource, /data-qa-id="column-menu-item"/);
+  assert.match(multiSortSource, /data-tvt-screener-multi-sort/);
+  assert.match(multiSortSource, /data-tvt-pin-menu-item/);
+  assert.match(multiSortSource, /data-tvt-pin/);
+  assert.match(multiSortSource, /table\[\$\{MARKER\}=\"active\"\]/);
+  assert.match(multiSortSource, /`Unpin "\$\{label\}"/);
+});
+
+test("multi-sort pins a header with a CSS-only direction glyph", () => {
+  assert.match(multiSortSource, /th\[data-field\]\[\$\{PIN_MARKER\}\]/);
+  assert.match(multiSortSource, /content: " ▲"/);
+  assert.match(multiSortSource, /content: " ▼"/);
+  assert.match(multiSortSource, /var\(--color-brand, #2962ff\)/);
+});
+
+test("multi-sort sorts rows stably without hashed selectors", () => {
+  assert.match(multiSortSource, /rows\.sort\(/);
+  assert.match(multiSortSource, /localeCompare/);
+  assert.match(multiSortSource, /data-rowkey/);
+  assert.match(multiSortSource, /FIELD_MAP = Object\.freeze\(\{/);
+  assert.match(multiSortSource, /MarketCap: "market_cap_basic"/);
+  assert.match(multiSortSource, /Sector: "sector"/);
+  assert.match(multiSortSource, /AnalystRating: "AnalystRating"/);
+});
+
+test("multi-sort fallback parses formatted TradingView cell text", () => {
+  assert.match(multiSortSource, /parseNumericText/);
+  assert.match(multiSortSource, /SUFFIX_FACTOR/);
+  assert.match(multiSortSource, /RATING_TEXT_RANK/);
+});
+
+test("multi-sort registers in the runtime and popup", () => {
+  assert.match(contentSource, /new root\.ScreenerMultiSortFeature/);
+  assert.match(contentSource, /multiSortFeature\]/);
+  assert.match(contentSource, /TVT_ENSURE_SCAN_HOOK/);
+  assert.match(popupSource, /"screener-multi-sort": "Secondary sort"/);
+  assert.match(popupHtml, /id="multi-sort-enabled"/);
+  assert.match(popupHtml, /id="reset-multi-sort"/);
+});
+
+test("scan hook relays raw values from the MAIN world without hashed selectors", () => {
+  assert.match(hookSource, /__tvtScanHookInstalled/);
+  assert.match(hookSource, /scanner\\\.tradingview\\\.com/);
+  assert.match(hookSource, /response\.clone\(\)/);
+  assert.match(hookSource, /postMessage/);
+  assert.match(hookSource, /tvt-scan-capture/);
+  assert.match(hookSource, /XMLHttpRequest\.prototype\.(open|send)/);
+  assert.match(hookSource, /extractScanPayload/);
+  assert.match(hookSource, /mapScanData/);
+});
+
+test("background injects the hook into the MAIN world when multi-sort is enabled", () => {
+  assert.equal(manifest.background.service_worker, "src/background.js");
+  assert.match(backgroundSource, /world: "MAIN"/);
+  assert.match(backgroundSource, /screener-multi-sort-hook\.js/);
+  assert.match(backgroundSource, /screenerMultiSort/);
+  assert.match(backgroundSource, /TVT_ENSURE_SCAN_HOOK/);
+  assert.ok(manifest.content_scripts[0].js.includes("src/features/screener-multi-sort.js"));
 });
 
 test("Symbol header uses responsive modes without generated selectors", () => {

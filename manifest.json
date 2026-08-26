@@ -1,12 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "TradingView Local Customizer",
-  "version": "0.5.7",
-  "description": "Local, visual-only TradingView layout customizations.",
+  "name": "ScreenerKit",
+  "version": "0.6.0",
+  "description": "Compact and customize the TradingView Screener.",
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": ["https://*.tradingview.com/*"],
+  "background": {
+    "service_worker": "src/background.js"
+  },
   "action": {
-    "default_title": "TradingView Local Customizer",
+    "default_title": "ScreenerKit",
     "default_popup": "popup.html"
   },
   "options_ui": {
@@ -25,6 +28,7 @@
         "src/features/screener-symbol-width.js",
         "src/features/screener-table-density.js",
         "src/features/screener-grid-lines.js",
+        "src/features/screener-multi-sort.js",
         "src/core/lifecycle.js",
         "src/content.js"
       ],

@@ -26,6 +26,9 @@ test("normalizes missing settings to safe defaults", () => {
   assert.equal(result.features.screenerTableDensity.rowHeightPx, 34);
   assert.equal(result.features.screenerGridLines.enabled, false);
   assert.equal(result.features.screenerGridLines.color, "#2a2e39");
+  assert.equal(result.features.screenerMultiSort.enabled, false);
+  assert.equal(result.features.screenerMultiSort.pinnedField, null);
+  assert.equal(result.features.screenerMultiSort.pinnedOrder, "asc");
   assert.equal(result.features.interfaceTheme.selection, "native");
   assert.equal(result.features.interfaceTheme.custom.surface, Settings.CUSTOM_THEME_DEFAULT.surface);
 });
@@ -159,6 +162,27 @@ test("normalizes grid-line colors and preserves the enable state", () => {
       `unexpected color accepted: ${invalid}`
     );
   }
+});
+
+test("normalizes the multi-sort pin state safely", () => {
+  const Settings = loadSettings();
+  const defaults = Settings.normalizeMultiSort({});
+  assert.equal(defaults.enabled, false);
+  assert.equal(defaults.pinnedField, null);
+  assert.equal(defaults.pinnedOrder, "asc");
+
+  const pinned = Settings.normalizeMultiSort({
+    enabled: true,
+    pinnedField: "EpsDilutedGrowth|YoYTTM",
+    pinnedOrder: "desc"
+  });
+  assert.equal(pinned.enabled, true);
+  assert.equal(pinned.pinnedField, "EpsDilutedGrowth|YoYTTM");
+  assert.equal(pinned.pinnedOrder, "desc");
+
+  const invalid = Settings.normalizeMultiSort({ enabled: true, pinnedField: "Sector; drop table", pinnedOrder: "sideways" });
+  assert.equal(invalid.pinnedField, null);
+  assert.equal(invalid.pinnedOrder, "asc");
 });
 
 test("normalizes interface theme selections and custom colors", () => {

@@ -11,6 +11,7 @@
     "src/features/screener-symbol-width.js",
     "src/features/screener-table-density.js",
     "src/features/screener-grid-lines.js",
+    "src/features/screener-multi-sort.js",
     "src/core/lifecycle.js",
     "src/content.js"
   ];
@@ -31,7 +32,8 @@
     "interface-theme": "Interface theme",
     "screener-symbol-width": "Symbol column",
     "screener-table-density": "Table density",
-    "screener-grid-lines": "Grid lines"
+    "screener-grid-lines": "Grid lines",
+    "screener-multi-sort": "Secondary sort"
   });
   const elements = {};
   let currentSettings;
@@ -65,6 +67,9 @@
     elements.gridLinesColor = document.getElementById("grid-lines-color");
     elements.gridLinesColorOutput = document.getElementById("grid-lines-color-output");
     elements.resetGridLinesColor = document.getElementById("reset-grid-lines-color");
+    elements.multiSortFeature = document.getElementById("multi-sort-enabled");
+    elements.multiSortStatus = document.getElementById("multi-sort-status");
+    elements.resetMultiSort = document.getElementById("reset-multi-sort");
     elements.diagnostics = document.getElementById("diagnostics-enabled");
     elements.resetWidth = document.getElementById("reset-width");
     elements.resetDensity = document.getElementById("reset-density");
@@ -77,6 +82,7 @@
     const symbol = currentSettings.features.screenerSymbolWidth;
     const density = currentSettings.features.screenerTableDensity;
     const gridLines = currentSettings.features.screenerGridLines;
+    const multiSort = currentSettings.features.screenerMultiSort;
     const masterDisabled = !currentSettings.enabled;
 
     elements.master.checked = currentSettings.enabled;
@@ -92,6 +98,11 @@
     elements.gridLinesFeature.checked = gridLines.enabled;
     elements.gridLinesColor.value = gridLines.color;
     elements.gridLinesColorOutput.value = gridLines.color;
+    elements.multiSortFeature.checked = multiSort.enabled;
+    elements.multiSortStatus.dataset.pinned = String(Boolean(multiSort.pinnedField));
+    elements.multiSortStatus.textContent = multiSort.pinnedField
+      ? `Pinned: ${multiSort.pinnedField} (${multiSort.pinnedOrder}).`
+      : "No column pinned.";
 
     elements.symbolFeature.disabled = masterDisabled;
     elements.width.disabled = masterDisabled || !symbol.enabled;
@@ -101,6 +112,8 @@
     elements.gridLinesFeature.disabled = masterDisabled;
     elements.gridLinesColor.disabled = masterDisabled || !gridLines.enabled;
     elements.resetGridLinesColor.disabled = elements.gridLinesColor.disabled;
+    elements.multiSortFeature.disabled = masterDisabled;
+    elements.resetMultiSort.disabled = masterDisabled || !multiSort.enabled || !multiSort.pinnedField;
 
     for (const button of elements.themeButtons) {
       button.disabled = masterDisabled;
@@ -185,6 +198,12 @@
         target: { tabId: tab.id },
         files: CONTENT_SCRIPT_FILES
       });
+
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        world: "MAIN",
+        files: ["src/features/screener-multi-sort-hook.js"]
+      }).catch(() => {});
 
       return chrome.tabs.sendMessage(tab.id, { type });
     }
@@ -314,6 +333,16 @@
 
     elements.resetGridLinesColor.addEventListener("click", () => {
       currentSettings.features.screenerGridLines.color = Settings.GRID_LINE_COLOR_DEFAULT;
+      persist();
+    });
+
+    elements.multiSortFeature.addEventListener("change", () => {
+      currentSettings.features.screenerMultiSort.enabled = elements.multiSortFeature.checked;
+      persist();
+    });
+
+    elements.resetMultiSort.addEventListener("click", () => {
+      currentSettings.features.screenerMultiSort.pinnedField = null;
       persist();
     });
 

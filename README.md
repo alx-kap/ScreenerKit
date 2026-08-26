@@ -1,95 +1,144 @@
-# TradingView Local Customizer
+# ScreenerKit — Compact & Customize the TradingView Screener
 
-A personal Chromium extension for local, visual-only TradingView customizations. Version 0.5.7 provides Default, true-black OLED, and Custom interface themes alongside the adjustable Symbol-column width, independent Screener table density controls, and customizable Screener grid lines.
+**See more columns. Fit more data. No zooming required.**
 
-The extension does not read credentials, intercept requests, alter trading actions, load remote code, or communicate with external services. Settings are stored in `chrome.storage.local`.
+ScreenerKit is a free, open-source Chromium extension that gives you full control over how TradingView's Stock Screener looks — without touching your chart, without zooming your browser, and without changing any TradingView settings.
 
-## Install in Brave
+If you've ever wished the Screener showed more columns on screen, or that the rows were tighter so you could scan more tickers at a glance — that's exactly what this does.
 
-1. Open `brave://extensions`.
-2. Turn on **Developer mode**.
-3. Choose **Load unpacked**.
-4. Select this project directory.
-5. Open the extension popup while viewing TradingView. It will initialize itself in an already-open tab if necessary.
+> **Not affiliated with TradingView.** ScreenerKit applies visual customizations only. It never reads your credentials, intercepts network requests, modifies trading actions, or communicates with external services.
 
-Chrome and most Chromium browsers use the equivalent Extensions page and **Load unpacked** action.
+---
 
-## Use
+## Why ScreenerKit?
 
-1. Open a TradingView chart and the extension popup.
-2. Choose Default, OLED Black, or Custom under **Interface theme**.
-3. For Custom, adjust the seven color tokens. A warning appears when text or muted text falls below the recommended 4.5:1 contrast ratio.
-4. Display the Stock Screener, enable **Compact Symbol column**, and adjust the width slider.
-5. Use **Reset width** to restore the extension default of 100 px.
-6. Enable **Screener table density** and choose Comfortable, Compact, or Dense.
-7. Expand **Advanced** to tune body font, header font, row height, header height, horizontal padding, or the sidebar's left inset individually.
-8. Enable **Screener grid lines** to add vertical column separators and recolor existing row separators with one shared color.
-9. Use **Reset color** to restore the grid-line default of `#2a2e39`.
-10. Use the master toggle to remove all injected styles immediately.
+TradingView's Screener is powerful, but it wastes a lot of screen space. The Symbol column is wider than it needs to be, rows are tall, and there's no way to adjust density without zooming your entire browser — which also shrinks your chart, toolbar, and everything else.
 
-## Interface themes
+ScreenerKit fixes that. You get independent control over the Screener layout while the rest of TradingView stays exactly as it is.
 
-The interface theme covers TradingView chrome and transient UI, including Symbol Search and the Layouts dropdown. OLED Black keeps resting layout cards true black, uses subtle gray separators and interaction states, and preserves the light selected-layout treatment.
+**What you can do:**
 
-Themes recolor TradingView's semantic interface surfaces: page gutters, toolbars, side panels, menus, dialogs, tooltips, controls, borders, text, icons, and active accents. They do not override chart canvas backgrounds, candles, plots, indicators, drawings, or financial/status colors such as buy, sell, positive, negative, and warning.
+- **Narrow the Symbol column** (76–220 px) to reclaim horizontal space for data columns
+- **Change table density** — switch between Comfortable, Compact, and Dense presets, or fine-tune body font, header font, row height, header height, padding, and sidebar inset individually
+- **Add grid lines** — vertical column separators and custom-colored row separators for easier scanning
+- **Pin a secondary sort** — group Screener rows by a second column while keeping TradingView's primary sort intact
+- **Apply interface themes** — choose true-black OLED or build a fully custom color scheme with seven configurable tokens and live contrast-ratio feedback
 
-**Default** is selected automatically on new installs and upgrades, so the extension does not change existing appearance until a theme is chosen. OLED Black sets the page, standard, elevated, dialog, popup, and neutral control surfaces to true black while retaining `#2a2a2e` section separators, borders, text, accent, and hover states. Custom values remain stored while switching themes; **Reset custom** restores the original custom-editor values. Selecting Default, disabling the master toggle, or unloading the extension removes the owned root marker and style element.
+All settings persist across sessions and apply instantly.
 
-Symbol Search result rows follow the same OLED treatment: black row surfaces, `#2a2a2e` row separators and hover fill, a light keyboard-active outline, and the configured accent for selected rows.
+---
 
-The supported range is 76–220 px. Very narrow values may truncate long tickers or secondary status badges; this is intentional and reversible. The Symbol header adapts automatically so its search control, label, result count, and sort button do not overlap the next column:
+## Install
 
-- 140 px and above: full-size header controls.
-- 110–139 px: smaller search control and tighter spacing.
-- 90–109 px: compact search control; the label and result count remain stacked and clipped to the cell.
-- 76–89 px: the label and result count remain visible; the sort control yields the limited space.
+Works in **Brave**, **Chrome**, **Edge**, **Arc**, and most Chromium browsers.
 
-Density presets:
+1. Download or clone this repository.
+2. Open your browser's Extensions page (`brave://extensions`, `chrome://extensions`, etc.).
+3. Enable **Developer mode**.
+4. Click **Load unpacked** and select this project folder.
+5. Navigate to TradingView, open the Stock Screener, and click the ScreenerKit icon.
 
-| Preset | Body font | Header font | Row | Header | Horizontal padding | Left inset |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Comfortable | 14 px | 14 px | 41 px | 50 px | 12 px | 20 px |
-| Compact | 13 px | 13 px | 34 px | 42 px | 8 px | 8 px |
-| Dense | 12 px | 12 px | 28 px | 36 px | 4 px | 0 px |
+No build step. No dependencies. No account required.
 
-Moving any Advanced slider creates a Custom preset. **Reset density** restores Compact. The left-inset control supports 0–24 px; 0 px makes the table flush with the Screener content edge. Native colored flags are positioned at the Symbol cell edge, outside layout flow, and narrowed to remain visible without adding table padding. Density is disabled by default when upgrading from version 0.1, so existing Symbol-width behavior does not change until the feature is enabled.
+---
 
-Grid lines are disabled by default on new installs and upgrades. When enabled, 1 px separators run between columns through the header and body, but not around the table's outside edge. The selected color also replaces the color of TradingView's existing horizontal row separators without changing their native thickness or style. The header's native horizontal separator is left unchanged.
+## Features
 
-## Detection and diagnostics
+### Compact Symbol Column
 
-All table features share one conservative detector and activate only when it finds all of these live DOM contracts:
+The Symbol column defaults to a wide layout that pushes your data columns off screen. ScreenerKit lets you shrink it down to as narrow as 76 px — freeing up room for the columns that actually matter.
 
-- `th[data-field="TickerUniversal"]` at column index 0;
-- a containing HTML `table`;
-- a direct `tbody[data-testid="selectable-rows-table-body"]`;
-- a direct `tr[data-rowkey]` whose first child is a table cell.
+The header adapts automatically at different widths so the search control, label, count, and sort button never overlap.
 
-If only part of that structure is present, the extension fails closed and reports a degraded state for each enabled feature. It never falls back to a hashed TradingView class name or a text-only `Symbol` match.
+### Table Density
+
+Three built-in presets:
+
+| Preset | Body font | Row height | Padding |
+| --- | ---: | ---: | ---: |
+| Comfortable | 14 px | 41 px | 12 px |
+| Compact | 13 px | 34 px | 8 px |
+| Dense | 12 px | 28 px | 4 px |
+
+Or go fully custom — every parameter has its own slider under Advanced.
+
+### Grid Lines
+
+Adds 1 px vertical separators between columns and lets you recolor TradingView's existing row separators. Makes it much easier to scan across wide tables.
+
+### Secondary Sort
+
+TradingView's API only accepts one sort key. ScreenerKit works around this by locally re-ordering the rendered rows by a pinned second column, preserving the primary sort within each group.
+
+- Left-click any column header → **Pin "…" (secondary sort)**
+- Click again to flip direction, a third time to unpin
+- A colored arrow on the header shows the active pin
+- Re-sorts automatically as TradingView loads more rows
+
+### Interface Themes
+
+- **Default** — no changes, TradingView's native dark theme
+- **OLED Black** — true-black surfaces for OLED displays, with subtle gray separators and preserved accent colors
+- **Custom** — set Page, Surface, Elevated, Border, Text, Muted text, and Accent independently, with a live WCAG contrast-ratio readout
+
+Themes cover TradingView's UI chrome (toolbars, panels, menus, dialogs, controls) without touching chart canvases, indicators, or financial colors.
+
+---
+
+## How It Works
+
+ScreenerKit detects the Screener table through stable, semantic DOM contracts — never hashed class names. It activates only when all of these are present:
+
+- `th[data-field="TickerUniversal"]` at column index 0
+- A containing `<table>`
+- A `tbody[data-testid="selectable-rows-table-body"]`
+- A `tr[data-rowkey]` whose first child is a table cell
+
+If the structure isn't found, every feature fails closed and reports a degraded state. Nothing falls back to guessing.
+
+---
 
 ## Development
 
-No install or build step is required.
-
 ```sh
-npm run check
-npm test
+npm run check   # syntax check all source files
+npm test        # run the test suite
 ```
 
-For a browser-level smoke test without installing the extension, serve the repository and open `tests/fixture.html`. The fixture runs the real feature module against a minimal TradingView-like table contract.
+For browser-level smoke testing without installing the extension, serve the repo and open `tests/fixture.html`.
 
-After changing source files, use **Reload** on the extension card in `brave://extensions`, then reload TradingView.
+After changing source files, hit **Reload** on the extension card in your browser's Extensions page, then reload TradingView.
+
+---
 
 ## Troubleshooting
 
-- **Screener table not detected yet:** open the Stock Screener and press **Refresh detection**.
-- **Unable to initialize the tab:** confirm the active tab is an `https://` TradingView page. Reload the extension card after updating source files, then reopen the popup.
-- **Degraded:** TradingView's DOM contract changed or the table has not completed rendering. Disable the feature and capture the sanitized diagnostics before updating selectors.
-- **Column still too wide:** verify the popup reports `active`; then test a smaller width. Do not add hashed class selectors as a quick fix.
-- **Density does not change:** verify **Table density** reports `active`, then confirm the feature toggle is enabled. Advanced values are applied when the slider is released.
-- **Grid lines do not change:** verify **Grid lines** reports `active`, then confirm the feature toggle is enabled and choose a color that contrasts with the current TradingView theme.
-- **Theme does not change:** verify **Interface theme** reports `active`, confirm the master toggle is enabled, and choose a non-default theme.
+| Problem | Fix |
+| --- | --- |
+| Screener table not detected | Open the Stock Screener and press **Refresh detection** in ScreenerKit |
+| Unable to initialize | Confirm the active tab is an `https://` TradingView page. Reload the extension, then reopen the popup |
+| Column still too wide | Verify the popup reports `active`, then try a smaller width |
+| Density won't change | Check that **Table density** reports `active` and the toggle is enabled |
+| Grid lines won't appear | Verify the toggle is enabled and the color contrasts with your current theme |
+| Sort pin menu missing | Enable **Secondary sort** in ScreenerKit, then reload TradingView |
+| Rows don't re-sort | Confirm a column is pinned (colored arrow on header). Scroll to load more rows |
+| Theme won't apply | Enable the master toggle and select a non-Default theme |
 
-## Scope
+---
 
-Only local presentation is in scope. Account data, cookies, browser storage owned by TradingView, network requests, alerts, orders, and TradingView application state are out of scope.
+## Scope & Privacy
+
+ScreenerKit is strictly local. It injects CSS and reorders rendered DOM elements in your browser tab. It does not:
+
+- Access your TradingView account, cookies, or stored data
+- Intercept or modify network requests
+- Send data to any external server
+- Alter alerts, orders, or any TradingView application state
+
+Settings are stored in `chrome.storage.local` on your machine.
+
+---
+
+## License
+
+MIT

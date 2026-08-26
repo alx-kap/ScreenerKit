@@ -1,10 +1,10 @@
 {
-  "name": "tradingview-local-customizer",
-  "version": "0.5.7",
+  "name": "screenerkit",
+  "version": "0.6.0",
   "private": true,
-  "description": "Visual-only local customizations for TradingView in Chromium browsers.",
+  "description": "Compact and customize the TradingView Screener — adjust column widths, table density, grid lines, multi-column sorting, and interface themes.",
   "scripts": {
-    "check": "node --check src/core/namespace.js && node --check src/core/settings.js && node --check src/core/style-manager.js && node --check src/core/screener-table-adapter.js && node --check src/features/interface-theme.js && node --check src/features/screener-symbol-width.js && node --check src/features/screener-table-density.js && node --check src/features/screener-grid-lines.js && node --check src/core/lifecycle.js && node --check src/content.js && node --check popup.js",
+    "check": "node --check src/core/namespace.js && node --check src/core/settings.js && node --check src/core/style-manager.js && node --check src/core/screener-table-adapter.js && node --check src/features/interface-theme.js && node --check src/features/screener-symbol-width.js && node --check src/features/screener-table-density.js && node --check src/features/screener-grid-lines.js && node --check src/features/screener-multi-sort.js && node --check src/features/screener-multi-sort-hook.js && node --check src/background.js && node --check src/core/lifecycle.js && node --check src/content.js && node --check popup.js",
     "test": "node --test tests/*.test.js"
   }
 }
